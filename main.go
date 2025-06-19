@@ -16,17 +16,33 @@ type PlaylistsObj struct {
 }
 
 type Playlist struct {
-	Href   string `json:"href"`
-	Id     string `json:"id"`
-	Name   string `json:"name"`
-	Tracks struct {
+	Name  string `json:"name"`
+	Songs struct {
 		// flesh out properties
+		Limit  int32           `json:"limit"`
+		Next   string          `json:"next"`
+		Offset int32           `json:"offset"`
+		Total  int32           `json:"total"`
+		Track  []PlaylistTrack `json:"items"`
 	} `json:"tracks"`
-	Uri string `json:"uri"`
 }
 
-type Tracks struct {
-	Href string `json:"href"`
+type PlaylistTrack struct {
+	Track TrackObj `json:"track"`
+}
+
+type TrackObj struct {
+	Name    string   `json:"name"`
+	Artists []Artist `json:"artists"`
+	Album   AlbumObj `json:"album"`
+}
+
+type AlbumObj struct {
+	Name string `json:"name"`
+}
+
+type Artist struct {
+	Name string `json:"name"`
 }
 
 func main() {
@@ -37,7 +53,7 @@ func main() {
 
 	bearerToken := os.Getenv("BEARER")
 
-	req, err := http.NewRequest("GET", "https://api.spotify.com/v1/playlists/4voN0nDgKI3gPXVRDefAfn?si=e4559cf1db6b461a", nil)
+	req, err := http.NewRequest("GET", "https://api.spotify.com/v1/playlists/6lOjimIiWeIdU9PAgNnafR", nil)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -60,6 +76,8 @@ func main() {
 	if err := json.Unmarshal(body, &playlist); err != nil {
 		log.Fatal(err)
 	}
+
+	// fmt.Printf("Songs: %d\n", playlist.Songs.Total)
 
 	result, err := json.MarshalIndent(playlist, "", "    ")
 	if err != nil {
